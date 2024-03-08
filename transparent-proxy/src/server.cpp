@@ -188,6 +188,23 @@ void ProxyServer::processRequests() {
                 if (writeRequest(new_sockfd, http_request) <= 0) {
                     std::cerr << "Error writing request on the new socket" << std::endl;
                 }
+
+                // add a SNAT dynamically
+                // Get the socket's local address and port
+                struct sockaddr_in local_sockaddr;
+                socklen_t sockaddr_len = sizeof(local_sockaddr);
+                if (getsockname(client_sockfd, (struct sockaddr*)&local_sockaddr, &sockaddr_len) == -1) {
+                    std::cerr << "Failed to get socket name" << std::endl;
+                    close(client_sockfd);
+                }
+
+                // Convert the IP address to a string
+                char ip_str[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &local_sockaddr.sin_addr, ip_str, sizeof(ip_str));
+
+                // Print the source address and port
+                Logger::debug("Source address: ", ip_str);
+                Logger::debug("Source port: ", ntohs(local_sockaddr.sin_port));
             }
         }
     }
