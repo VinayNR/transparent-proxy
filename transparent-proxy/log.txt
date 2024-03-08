@@ -1,0 +1,87 @@
+15:42:31  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket ---------- 
+15:42:31  [0x1e17fe080]  DEBUG	Socket FD: 4 and port number: 6666
+15:42:31  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket complete ---------- 
+15:42:31  [0x1e17fe080]  DEBUG	---------- Creating worker threads for the server -----------
+15:42:31  [0x16d0cf000]  DEBUG	------ Proxy Server Thread Pool: 0x16d0cf000 ------- 
+15:42:31  [0x16d15b000]  DEBUG	------ Proxy Server Thread Pool: 0x16d15b000 ------- 
+15:42:31  [0x16d38b000]  DEBUG	------ Proxy Server Thread Pool: 0x16d38b000 ------- 
+15:42:31  [0x16d4a3000]  DEBUG	------ Proxy Server Thread Pool: 0x16d4a3000 ------- 
+15:42:31  [0x1e17fe080]  DEBUG	-------- Started Transparent Proxy ---------
+15:42:31  [0x16d1e7000]  DEBUG	------ Proxy Server Thread Pool: 0x16d1e7000 ------- 
+15:42:31  [0x16d417000]  DEBUG	------ Proxy Server Thread Pool: 0x16d417000 ------- 
+15:42:31  [0x16d273000]  DEBUG	------ Proxy Server Thread Pool: 0x16d273000 ------- 
+15:42:31  [0x16d52f000]  DEBUG	------ Proxy Server Thread Pool: 0x16d52f000 ------- 
+15:42:31  [0x16d5bb000]  DEBUG	------ Proxy Server Thread Pool: 0x16d5bb000 ------- 
+15:42:31  [0x16d2ff000]  DEBUG	------ Proxy Server Thread Pool: 0x16d2ff000 ------- 
+15:43:12  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket ---------- 
+15:43:12  [0x1e17fe080]  DEBUG	Socket FD: 4 and port number: 6666
+15:43:12  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket complete ---------- 
+15:43:12  [0x1e17fe080]  DEBUG	---------- Creating worker threads for the server -----------
+15:43:12  [0x16f64b000]  DEBUG	------ Proxy Server Thread Pool: 0x16f64b000 ------- 
+15:43:12  [0x16f763000]  DEBUG	------ Proxy Server Thread Pool: 0x16f763000 ------- 
+15:43:12  [0x16f7ef000]  DEBUG	------ Proxy Server Thread Pool: 0x16f7ef000 ------- 
+15:43:12  [0x16f6d7000]  DEBUG	------ Proxy Server Thread Pool: 0x16f6d7000 ------- 
+15:43:12  [0x16f87b000]  DEBUG	------ Proxy Server Thread Pool: 0x16f87b000 ------- 
+15:43:12  [0x16f907000]  DEBUG	------ Proxy Server Thread Pool: 0x16f907000 ------- 
+15:43:12  [0x16f993000]  DEBUG	------ Proxy Server Thread Pool: 0x16f993000 ------- 
+15:43:12  [0x16fa1f000]  DEBUG	------ Proxy Server Thread Pool: 0x16fa1f000 ------- 
+15:43:12  [0x16faab000]  DEBUG	------ Proxy Server Thread Pool: 0x16faab000 ------- 
+15:43:12  [0x1e17fe080]  DEBUG	-------- Started Transparent Proxy ---------
+15:43:12  [0x16fb37000]  DEBUG	------ Proxy Server Thread Pool: 0x16fb37000 ------- 
+16:20:02  [0x1e17fe080]  DEBUG	Accepted a request from Client IP: 127.0.0.1
+16:20:02  [0x1e17fe080]  DEBUG	Added client connection to queue: 5
+16:20:02  [0x16f64b000]  DEBUG	0x16f64b000 obtained a client socket: 5
+16:21:26  [0x1e17fe080]  DEBUG	Accepted a request from Client IP: 127.0.0.1
+16:21:26  [0x1e17fe080]  DEBUG	Added client connection to queue: 6
+16:21:26  [0x16f763000]  DEBUG	0x16f763000 obtained a client socket: 6
+16:22:54  [0x1e17fe080]  DEBUG	Accepted a request from Client IP: 127.0.0.1
+16:22:54  [0x1e17fe080]  DEBUG	Added client connection to queue: 7
+16:22:54  [0x16f7ef000]  DEBUG	0x16f7ef000 obtained a client socket: 7
+18:34:08  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket ---------- 
+18:34:08  [0x1e17fe080]  DEBUG	Socket FD: 4 and port number: 6666
+18:34:08  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket complete ---------- 
+18:34:08  [0x1e17fe080]  DEBUG	---------- Creating worker threads for the server -----------
+18:34:08  [0x1e17fe080]  DEBUG	-------- Started Transparent Proxy ---------
+18:34:08  [0x16bd9f000]  DEBUG	------ Proxy Server Thread Pool: 0x16bd9f000 ------- 
+18:34:08  [0x16ba57000]  DEBUG	------ Proxy Server Thread Pool: 0x16ba57000 ------- 
+18:34:08  [0x16bb6f000]  DEBUG	------ Proxy Server Thread Pool: 0x16bb6f000 ------- 
+18:34:08  [0x16bd13000]  DEBUG	------ Proxy Server Thread Pool: 0x16bd13000 ------- 
+18:34:08  [0x16beb7000]  DEBUG	------ Proxy Server Thread Pool: 0x16beb7000 ------- 
+18:34:08  [0x16bbfb000]  DEBUG	------ Proxy Server Thread Pool: 0x16bbfb000 ------- 
+18:34:08  [0x16be2b000]  DEBUG	------ Proxy Server Thread Pool: 0x16be2b000 ------- 
+18:34:08  [0x16bc87000]  DEBUG	------ Proxy Server Thread Pool: 0x16bc87000 ------- 
+18:34:08  [0x16bae3000]  DEBUG	------ Proxy Server Thread Pool: 0x16bae3000 ------- 
+18:34:08  [0x16bf43000]  DEBUG	------ Proxy Server Thread Pool: 0x16bf43000 ------- 
+18:34:24  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket ---------- 
+18:34:24  [0x1e17fe080]  DEBUG	Socket FD: 4 and port number: 6666
+18:34:24  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket complete ---------- 
+18:34:24  [0x1e17fe080]  DEBUG	---------- Creating worker threads for the server -----------
+18:34:24  [0x16d90f000]  DEBUG	------ Proxy Server Thread Pool: 0x16d90f000 ------- 
+18:34:24  [0x16dbcb000]  DEBUG	------ Proxy Server Thread Pool: 0x16dbcb000 ------- 
+18:34:24  [0x1e17fe080]  DEBUG	-------- Started Transparent Proxy ---------
+18:34:24  [0x16ddfb000]  DEBUG	------ Proxy Server Thread Pool: 0x16ddfb000 ------- 
+18:34:24  [0x16db3f000]  DEBUG	------ Proxy Server Thread Pool: 0x16db3f000 ------- 
+18:34:24  [0x16d99b000]  DEBUG	------ Proxy Server Thread Pool: 0x16d99b000 ------- 
+18:34:24  [0x16dc57000]  DEBUG	------ Proxy Server Thread Pool: 0x16dc57000 ------- 
+18:34:24  [0x16dd6f000]  DEBUG	------ Proxy Server Thread Pool: 0x16dd6f000 ------- 
+18:34:24  [0x16da27000]  DEBUG	------ Proxy Server Thread Pool: 0x16da27000 ------- 
+18:34:24  [0x16dce3000]  DEBUG	------ Proxy Server Thread Pool: 0x16dce3000 ------- 
+18:34:24  [0x16dab3000]  DEBUG	------ Proxy Server Thread Pool: 0x16dab3000 ------- 
+18:34:35  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket ---------- 
+18:34:35  [0x1e17fe080]  DEBUG	Socket FD: 4 and port number: 6666
+18:34:35  [0x1e17fe080]  DEBUG	 ---------- Setting up listening socket complete ---------- 
+18:34:35  [0x1e17fe080]  DEBUG	---------- Creating worker threads for the server -----------
+18:34:35  [0x16d1cf000]  DEBUG	------ Proxy Server Thread Pool: 0x16d1cf000 ------- 
+18:34:35  [0x16cf9f000]  DEBUG	------ Proxy Server Thread Pool: 0x16cf9f000 ------- 
+18:34:35  [0x16d0b7000]  DEBUG	------ Proxy Server Thread Pool: 0x16d0b7000 ------- 
+18:34:35  [0x16d25b000]  DEBUG	------ Proxy Server Thread Pool: 0x16d25b000 ------- 
+18:34:35  [0x16d143000]  DEBUG	------ Proxy Server Thread Pool: 0x16d143000 ------- 
+18:34:35  [0x16d02b000]  DEBUG	------ Proxy Server Thread Pool: 0x16d02b000 ------- 
+18:34:35  [0x16d373000]  DEBUG	------ Proxy Server Thread Pool: 0x16d373000 ------- 
+18:34:35  [0x1e17fe080]  DEBUG	-------- Started Transparent Proxy ---------
+18:34:35  [0x16d2e7000]  DEBUG	------ Proxy Server Thread Pool: 0x16d2e7000 ------- 
+18:34:35  [0x16cf13000]  DEBUG	------ Proxy Server Thread Pool: 0x16cf13000 ------- 
+18:34:35  [0x16d3ff000]  DEBUG	------ Proxy Server Thread Pool: 0x16d3ff000 ------- 
+18:34:41  [0x1e17fe080]  DEBUG	Accepted a request from Client IP: 127.0.0.1
+18:34:41  [0x1e17fe080]  DEBUG	Added client connection to queue: 5
+18:34:41  [0x16d1cf000]  DEBUG	0x16d1cf000 obtained a client socket: 5
