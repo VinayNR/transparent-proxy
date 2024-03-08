@@ -15,8 +15,6 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/sysctl.h>     
 
 #ifdef __linux__
 #include <netinet/ip.h>

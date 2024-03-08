@@ -5,6 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <cstring>
 
 HttpResponse::HttpResponse() {
     _http_response_body = nullptr;
