@@ -17,7 +17,7 @@ class ProxyServer {
 
         void processRequests();
 
-        std::vector<char> readRequest();
+        std::vector<char> readRequest(int);
 
     public:
         void setListeningSocket(int);

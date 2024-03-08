@@ -49,7 +49,7 @@ void ProxyServer::createClientThreadPool(int num_threads) {
     _thread_pool.createWorkerThreads(client_handling_task);
 }
 
-std::vector<char> ProxyServer::readRequest() {
+std::vector<char> ProxyServer::readRequest(int client_sockfd) {
     std::cout << std::endl << " ----------- Inside Read data ----------- " <<std::endl;
 
     int buffer_size = 0;
@@ -59,7 +59,7 @@ std::vector<char> ProxyServer::readRequest() {
     std::size_t content_length = 0, total_length = 0, header_size = 0;
     
     do {
-        if ((buffer_size = SocketOps::receive(sockfd_, buffer, 4096, 10)) <= 0) {
+        if ((buffer_size = SocketOps::receive(client_sockfd, buffer, 4096, 10)) <= 0) {
             std::cout << " ----------- The buffer size is less than 1, breaking ----------- " << std::endl;
             break;
         }
@@ -125,7 +125,7 @@ void ProxyServer::processRequests() {
             Logger::debug(std::this_thread::get_id(), " obtained a client socket: ", client_sockfd);
 
             // read an entire request here
-            std::vector<char> vec_data = readRequest();
+            std::vector<char> vec_data = readRequest(client_sockfd);
 
             // convert the request to an object
             if (vec_data.size() != 0) {
