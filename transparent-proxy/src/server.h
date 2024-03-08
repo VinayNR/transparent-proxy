@@ -2,6 +2,8 @@
 
 #include "concurrency/queue.h"
 #include "concurrency/threadpool.h"
+#include "http/request.h"
+#include "http/response.h"
 
 #include <vector>
 
@@ -17,7 +19,8 @@ class ProxyServer {
 
         void processRequests();
 
-        std::vector<char> readRequest(int);
+        HttpRequest* readRequest(int);
+        int writeRequest(int, HttpRequest *);
 
     public:
         void setListeningSocket(int);

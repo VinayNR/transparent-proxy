@@ -49,12 +49,14 @@ void ProxyServer::createClientThreadPool(int num_threads) {
     _thread_pool.createWorkerThreads(client_handling_task);
 }
 
-std::vector<char> ProxyServer::readRequest(int client_sockfd) {
+HttpRequest * ProxyServer::readRequest(int client_sockfd) {
     std::cout << std::endl << " ----------- Inside Read data ----------- " <<std::endl;
 
     int buffer_size = 0;
     char *buffer = nullptr;
     std::vector<char> v;
+
+    HttpRequest * http_request = nullptr;
 
     std::size_t content_length = 0, total_length = 0, header_size = 0;
     
@@ -108,7 +110,28 @@ std::vector<char> ProxyServer::readRequest(int client_sockfd) {
         std::cout << " -------- Finished Read Data ------- " << std::endl;
     }
 
-    return v;
+    // convert the request to an object
+    if (v.size() != 0) {
+        http_request = new HttpRequest;
+        http_request->setSerializedRequest(v.data(), v.size());
+
+        // deserialize the data into a http request object
+        if (http_request->deserialize() == -1) {
+            std::cerr << "Failed to deserialize request object" << std::endl;
+            delete http_request;
+            http_request = nullptr;
+        }
+    }
+
+    return http_request;
+}
+
+/*
+* Writes a request to the socket
+*/
+int ProxyServer::writeRequest(int sockfd, HttpRequest * http_request) {
+    std::cout << std::endl << " --------- Writing request --------- " << std::endl;
+    return SocketOps::send(sockfd, http_request->getSerializedRequest(), http_request->getSerializedRequestLength());
 }
 
 void ProxyServer::processRequests() {
@@ -125,38 +148,47 @@ void ProxyServer::processRequests() {
             Logger::debug(std::this_thread::get_id(), " obtained a client socket: ", client_sockfd);
 
             // read an entire request here
-            std::vector<char> vec_data = readRequest(client_sockfd);
-
-            // convert the request to an object
-            if (vec_data.size() != 0) {
-                http_request = new HttpRequest;
-                http_request->setSerializedRequest(vec_data.data(), vec_data.size());
-            }
-
-            // deserialize the data into a http request object
-            if (http_request->deserialize() == -1) {
-                std::cerr << "Failed to deserialize request object" << std::endl;
-                delete http_request;
-                http_request = nullptr;
-            }
+            http_request = readRequest(client_sockfd);
 
             // send this request to server
+            if (http_request != nullptr) {
+                // Retrieve the original destination address and port
+                struct sockaddr_in original_dst_addr;
+                socklen_t original_dst_addr_len = sizeof(original_dst_addr);
+                if (getsockopt(client_sockfd, ORIGINAL_DST_LEVEL, ORIGINAL_DST_OPTION, &original_dst_addr, &original_dst_addr_len) < 0) {
+                    perror("getsockopt");
+                    close(client_sockfd);
+                }
 
-            // Retrieve the original destination address and port
-            struct sockaddr_in original_dst_addr;
-            socklen_t original_dst_addr_len = sizeof(original_dst_addr);
-            if (getsockopt(client_sockfd, ORIGINAL_DST_LEVEL, ORIGINAL_DST_OPTION, &original_dst_addr, &original_dst_addr_len) < 0) {
-                perror("getsockopt");
-                close(client_sockfd);
+                // Convert the original destination address to a string
+                char original_dst_str[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &original_dst_addr.sin_addr, original_dst_str, sizeof(original_dst_str));
+
+                // Print the original destination address and port
+                Logger::debug("Original destination address: ", original_dst_str);
+                Logger::debug("Original destination port: ", ntohs(original_dst_addr.sin_port));
+
+                // connect to the server and issue this request
+
+                // create a new TCP socket to open a connection to the server
+                int new_sockfd;
+                if ((new_sockfd = SocketOps::createSocket(SOCK_STREAM)) == -1) {
+                    std::cerr << "Failed to create a socket" << std::endl;
+                    close(new_sockfd);
+                }
+
+                // Connect to the remote server
+                if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
+                    std::cerr << "Failed to connect to server" << std::endl;
+                    close(new_sockfd);
+                }
+
+                // send request to the server on behalf of the client
+                Logger::debug(" ----------- Making a request to server ----------- ");
+                if (writeRequest(new_sockfd, http_request) <= 0) {
+                    std::cerr << "Error writing request on the new socket" << std::endl;
+                }
             }
-
-            // Convert the original destination address to a string
-            char original_dst_str[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, &original_dst_addr.sin_addr, original_dst_str, sizeof(original_dst_str));
-
-            // Print the original destination address and port
-            Logger::debug("Original destination address: ", original_dst_str);
-            Logger::debug("Original destination port: ", ntohs(original_dst_addr.sin_port));
         }
     }
 }
