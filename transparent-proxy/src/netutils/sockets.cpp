@@ -28,12 +28,14 @@ int SocketOps::connectSocket(int sockfd, const struct addrinfo *server_info) {
 }
 
 int SocketOps::bindSocket(int sockfd, const char *port) {
-    struct addrinfo *local_address = nullptr;
-    if (getServerInfo(NULL, port, local_address) == -1) {
-        Logger::error("Failed to get address of local machine");
-        return -1;
-    }
-    return bind(sockfd, local_address->ai_addr, local_address->ai_addrlen);
+    // Create an address structure
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(std::stoi(port));
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to all interfaces
+    
+    return bind(sockfd, reinterpret_cast<struct sockaddr *>(&server_addr), sizeof(server_addr));
 }
 
 int SocketOps::listenOnSocket(int sockfd, int backlog) {
