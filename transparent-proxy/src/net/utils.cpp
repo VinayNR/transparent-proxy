@@ -62,6 +62,14 @@ int setupListeningSocket(int port, int socket_type) {
         return -1;
     }
 
+    // Set SO_REUSEPORT option
+    int optval = 1;
+    if (setsockopt(listen_socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1) {
+        std::cerr << "Failed to set SO_REUSEPORT option" << std::endl;
+        close(listen_socket_fd);
+        return -1;
+    }
+
     // display the socket
     Logger::debug("Socket FD: ", listen_socket_fd, " and port number: ", port);
 
@@ -69,7 +77,6 @@ int setupListeningSocket(int port, int socket_type) {
     * setsockopt: Handy debugging trick that lets us rerun the server immediately after we kill it; 
     * otherwise we have to wait about 20 secs. 
     */
-    int optval = 1;
     setsockopt(listen_socket_fd, SOL_SOCKET, optval, static_cast<const void*>(&optval) , sizeof(int));
 
     // bind the socket to the port

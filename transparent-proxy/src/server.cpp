@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
         Logger::debug("Running the server with default parameters...");
     }
 
-    int server_port = 6666;
+    int server_port = 8888;
 
     // parse command line options
     int option;
