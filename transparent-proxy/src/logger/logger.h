@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <mutex>
+#include <thread>
 #include <ctime>
 
 enum LogPriority {

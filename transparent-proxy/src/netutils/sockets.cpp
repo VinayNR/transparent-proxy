@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <cstring>
 
 // default constructor
 SocketOps::SocketOps() {}
