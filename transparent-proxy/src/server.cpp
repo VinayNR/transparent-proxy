@@ -8,7 +8,7 @@
 
 #include <sys/socket.h>
 #include <iostream>
-#include <stdio.h>
+#include <cstring>
 #include <stdlib.h>
 #include <getopt.h>
 #include <unistd.h>
