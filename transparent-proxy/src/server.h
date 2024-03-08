@@ -3,6 +3,8 @@
 #include "concurrency/queue.h"
 #include "concurrency/threadpool.h"
 
+#include <vector>
+
 class ProxyServer {
     private:
         int sockfd_;
@@ -14,6 +16,8 @@ class ProxyServer {
         Queue<int> *_requests_queue;
 
         void processRequests();
+
+        std::vector<char> readRequest();
 
     public:
         void setListeningSocket(int);

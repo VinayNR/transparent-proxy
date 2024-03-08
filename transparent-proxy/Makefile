@@ -2,11 +2,13 @@ CC = g++  # Compiler
 CFLAGS = -std=c++17  # Compiler flags
 
 concurrency = src/concurrency/*.cpp
+http = src/http/*.cpp
 logger = src/logger/*.cpp
-netutils = src/netutils/*.cpp
+net = src/net/*.cpp
+utils = src/utils/*.cpp
 
 all:
-	$(CC) $(CFLAGS) $(concurrency) $(logger) $(netutils) src/server.cpp -o server
+	$(CC) $(CFLAGS) $(concurrency) $(http) $(logger) $(net) $(utils) src/server.cpp -o server
 
 clean:
 	rm -f $(server)
