@@ -273,8 +273,9 @@ void ProxyServer::processRequests() {
                 Logger::debug("Source port: ", ntohs(peer_addr.sin_port));
 
                 // Add SNAT dynamically using iptables
-                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport" + std::string("8888") +  " --to-source " + std::string(local_ip_str);
+                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::string("8888") +  " --to-source " + std::string(local_ip_str);
                 system(command.c_str());
+                Logger::debug("Added a SNAT rule dynamically");
 
                 // connect to the server and issue this request
                 // create a new TCP socket to open a connection to the server
@@ -290,8 +291,23 @@ void ProxyServer::processRequests() {
                     close(new_sockfd);
                 }
 
+                // Get local address and port
+                struct sockaddr_in local_addr;
+                socklen_t addr_len = sizeof(local_addr);
+                if (getsockname(new_sockfd, (struct sockaddr*)&local_addr, &addr_len) == -1) {
+                    std::cerr << "Failed to get local address and port: " << std::strerror(errno) << std::endl;
+                    close(new_sockfd);
+                }
+
+                char local_ip_str[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &local_addr.sin_addr, local_ip_str, INET_ADDRSTRLEN);
+
                 // send request to the server on behalf of the client
                 Logger::debug(" ----------- Making a request to server ----------- ");
+                Logger::debug(" ------- Local IP Address: ", local_ip_str);
+                Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr.sin_port));
+
+                // write the request to the server
                 if (writeRequest(new_sockfd, http_request) <= 0) {
                     std::cerr << "Error writing request on the new socket" << std::endl;
                 }
