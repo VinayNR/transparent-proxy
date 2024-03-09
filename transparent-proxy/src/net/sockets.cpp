@@ -49,7 +49,31 @@ int SocketOps::acceptOnSocket(int sockfd) {
 
     int new_sock_fd = accept(sockfd, (struct sockaddr *) &client_addr, &addr_size);
 
-    Logger::debug("Accepted a request from Client IP: ", inet_ntoa(client_addr.sin_addr));
+    // Convert the client's IP address to a string
+    char ip_str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &client_addr.sin_addr, ip_str, INET_ADDRSTRLEN);
+
+    // Extract the client's port
+    uint16_t client_port = ntohs(client_addr.sin_port);
+
+    Logger::debug("Accepted a request from Client IP: ", ip_str, " Port: ", client_port);
+
+    Logger::debug("Using PEERNAME");
+    struct sockaddr_in client_addr_2;
+    socklen_t addr_size_2 = sizeof(client_addr_2);
+
+    if (getpeername(new_sock_fd, (struct sockaddr *)&client_addr_2, &addr_size_2) == -1) {
+        std::cerr << "Failed to get peer address: " << strerror(errno) << std::endl;
+        return 1;
+    }
+
+    char ip_str_2[INET_ADDRSTRLEN];
+    if (inet_ntop(AF_INET, &(client_addr_2.sin_addr), ip_str_2, INET_ADDRSTRLEN) == NULL) {
+        std::cerr << "Failed to convert client address to string: " << strerror(errno) << std::endl;
+        return 1;
+    }
+    uint16_t client_port_2 = ntohs(client_addr_2.sin_port);
+    Logger::debug("Accepted a request from Client IP: ", ip_str_2, " Port: ", client_port_2);
 
     return new_sock_fd;
 }

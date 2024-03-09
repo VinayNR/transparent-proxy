@@ -19,8 +19,12 @@ class ProxyServer {
 
         void processRequests();
 
+        std::vector<char> readDataOnSocket(int);
+
         HttpRequest* readRequest(int);
         int writeRequest(int, HttpRequest *);
+        HttpResponse * readResponse(int);
+        int writeResponse(int, HttpResponse *);
 
     public:
         void setListeningSocket(int);
