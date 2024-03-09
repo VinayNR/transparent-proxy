@@ -190,23 +190,7 @@ void ProxyServer::processRequests() {
                 }
 
                 // add a SNAT dynamically
-                // Get the socket's local address and port
-                struct sockaddr_in local_sockaddr;
-                socklen_t sockaddr_len = sizeof(local_sockaddr);
-                if (getsockname(client_sockfd, (struct sockaddr*)&local_sockaddr, &sockaddr_len) == -1) {
-                    std::cerr << "Failed to get socket name" << std::endl;
-                    close(client_sockfd);
-                }
 
-                // Convert the IP address to a string
-                char ip_str[INET_ADDRSTRLEN];
-                inet_ntop(AF_INET, &local_sockaddr.sin_addr, ip_str, sizeof(ip_str));
-
-                // Print the source address and port
-                Logger::debug("Source address: ", ip_str);
-                Logger::debug("Source port: ", ntohs(local_sockaddr.sin_port));
-
-                // Get the local address and port for the socket
                 // Get the peer address and port for the socket
                 struct sockaddr_in peer_addr;
                 socklen_t peer_len = sizeof(peer_addr);
@@ -220,7 +204,8 @@ void ProxyServer::processRequests() {
                 inet_ntop(AF_INET, &peer_addr.sin_addr, local_ip_str, sizeof(local_ip_str));
 
                 // Print the source IP address
-                std::cout << "Source IP address: " << local_ip_str << std::endl;
+                Logger::debug("Source address: ", local_ip_str);
+                Logger::debug("Source port: ", ntohs(peer_addr.sin_port));
             }
         }
     }
