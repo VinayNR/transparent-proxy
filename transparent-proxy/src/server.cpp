@@ -205,6 +205,22 @@ void ProxyServer::processRequests() {
                 // Print the source address and port
                 Logger::debug("Source address: ", ip_str);
                 Logger::debug("Source port: ", ntohs(local_sockaddr.sin_port));
+
+                // Get the local address and port for the socket
+                // Get the peer address and port for the socket
+                struct sockaddr_in peer_addr;
+                socklen_t peer_len = sizeof(peer_addr);
+                if (getpeername(client_sockfd, (struct sockaddr*)&peer_addr, &peer_len) == -1) {
+                    std::cerr << "Failed to get peer address and port" << std::endl;
+                    close(client_sockfd);
+                }
+
+                // Convert the IP address to a string
+                char local_ip_str[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &peer_addr.sin_addr, local_ip_str, sizeof(local_ip_str));
+
+                // Print the source IP address
+                std::cout << "Source IP address: " << local_ip_str << std::endl
             }
         }
     }
