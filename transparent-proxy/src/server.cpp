@@ -220,7 +220,7 @@ void ProxyServer::processRequests() {
                 inet_ntop(AF_INET, &peer_addr.sin_addr, local_ip_str, sizeof(local_ip_str));
 
                 // Print the source IP address
-                std::cout << "Source IP address: " << local_ip_str << std::endl
+                std::cout << "Source IP address: " << local_ip_str << std::endl;
             }
         }
     }
