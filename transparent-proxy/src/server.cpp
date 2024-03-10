@@ -299,32 +299,33 @@ void ProxyServer::processRequests() {
                 memset(&local_addr, 0, sizeof(local_addr));
                 local_addr.sin_family = AF_INET;
                 local_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to any available local IP address
-                local_addr.sin_port = htons(55555); // Let the system choose an available local port
+                local_addr.sin_port = htons(0); // Let the system choose an available local port
 
                 if (bind(new_sockfd, (struct sockaddr*)&local_addr, sizeof(local_addr)) == -1) {
                     std::cerr << "Failed to bind socket" << std::endl;
                     close(new_sockfd);
                 }
 
+                // Retrieve the local port using getsockname
+                struct sockaddr_in local_addr2;
+                socklen_t addrlen = sizeof(local_addr2);
+                if (getsockname(new_sockfd, (struct sockaddr*)&local_addr2, &addrlen) == -1) {
+                    std::cerr << "Failed to get local socket address" << std::endl;
+                    close(new_sockfd);
+                }
+
+                Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr2.sin_port));
+
+                // Add SNAT dynamically using iptables
+                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr2.sin_port)) + " --to-source " + std::string(peer_ip_str);
+                system(command.c_str());
+                Logger::debug("Added a SNAT rule dynamically");
+
                 // Connect to the remote server
                 if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
                     std::cerr << "Failed to connect to server" << std::endl;
                     close(new_sockfd);
                 }
-
-                // Retrieve the local port using getsockname
-                socklen_t addrlen = sizeof(local_addr);
-                if (getsockname(new_sockfd, (struct sockaddr*)&local_addr, &addrlen) == -1) {
-                    std::cerr << "Failed to get local socket address" << std::endl;
-                    close(new_sockfd);
-                }
-
-                Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr.sin_port));
-
-                // Add SNAT dynamically using iptables
-                // std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
-                // system(command.c_str());
-                // Logger::debug("Added a SNAT rule dynamically");
 
                 Logger::debug(" ----------- Making a request to server ----------- ");
                 // write the request to the server
@@ -335,10 +336,10 @@ void ProxyServer::processRequests() {
                 // wait for response
 
                 // delete the dynamic SNAT added for this client connection
-                // std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
-                // if (system(delete_command.c_str()) == 0) {
-                //     Logger::debug("Deleted the SNAT rule dynamically");
-                // }
+                std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr2.sin_port)) + " --to-source " + std::string(peer_ip_str);
+                if (system(delete_command.c_str()) == 0) {
+                    Logger::debug("Deleted the SNAT rule dynamically");
+                }
 
             }
         }
