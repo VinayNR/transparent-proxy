@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
+#include <csignal>
 
 #ifdef __linux__
 #include <netinet/ip.h>
@@ -26,6 +27,19 @@
 #define ORIGINAL_DST_OPTION 1
 #define ORIGINAL_DST_LEVEL IPPROTO_IP
 #endif
+
+void ProxyServer::handleSignalINT(int signum) {
+    Logger::debug("Caught Signal Interrupt");
+    // Command to delete static DNAT configuration
+    std::string delete_command = "iptables -t nat -D PREROUTING -i ens224 -s 100.64.44.0/24 -p tcp --dport 8000 -j DNAT --to-destination 100.64.44.1:8888";
+
+    // Execute the command to delete the rule
+    if (system(delete_command.c_str()) == 0) {
+        Logger::debug("Deleted the static DNAT rule");
+    }
+
+    exit(signum);
+}
 
 void ProxyServer::setListeningSocket(int port) {
     if ((sockfd_ = setupListeningSocket(port, SOCK_STREAM)) == -1) {
@@ -265,15 +279,15 @@ void ProxyServer::processRequests() {
                 }
 
                 // Convert the IP address to a string
-                char local_ip_str[INET_ADDRSTRLEN];
-                inet_ntop(AF_INET, &peer_addr.sin_addr, local_ip_str, sizeof(local_ip_str));
+                char peer_ip_str[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &peer_addr.sin_addr, peer_ip_str, sizeof(peer_ip_str));
 
                 // Print the source IP address
-                Logger::debug("Source address: ", local_ip_str);
+                Logger::debug("Source address: ", peer_ip_str);
                 Logger::debug("Source port: ", ntohs(peer_addr.sin_port));
 
                 // Add SNAT dynamically using iptables
-                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::string("8888") +  " --to-source " + std::string(local_ip_str);
+                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport 8888 --to-source " + std::string(peer_ip_str);
                 system(command.c_str());
                 Logger::debug("Added a SNAT rule dynamically");
 
@@ -314,6 +328,13 @@ void ProxyServer::processRequests() {
 
                 // wait for response
 
+                // delete the dynamic SNAT added for this client connection
+                // Command to delete dynamically added SNAT rule
+                std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport 8888 --to-source " + std::string(peer_ip_str);
+                if (system(delete_command.c_str()) == 0) {
+                    Logger::debug("Deleted the SNAT rule dynamically");
+                }
+
             }
         }
     }
@@ -349,10 +370,16 @@ void showUsage() {
 int main(int argc, char *argv[]) {
 
     if (argc < 2) {
-        Logger::debug("Running the server with default parameters...");
+        Logger::debug("Running the transparent proxy server with default parameters...");
     }
 
-    int server_port = 8888;
+    int server_port = 8888; // default server port
+
+    // add a static DNAT configuration while starting the server
+    std::string command = "iptables -t nat -A PREROUTING -i ens224 -s 100.64.44.0/24 -p tcp --dport 8000 -j DNAT --to-destination 100.64.44.1:8888";
+    if (system(command.c_str()) == 0) {
+        Logger::debug("Added a static DNAT rule to route TCP traffic to this server");
+    }
 
     // parse command line options
     int option;
@@ -383,6 +410,10 @@ int main(int argc, char *argv[]) {
 
     // create an instance of the server
     ProxyServer server;
+
+    // register signal interrupt handler
+    signal(SIGINT, ProxyServer::handleSignalINT);
+    Logger::debug("Signal Interrupt Handler Setup");
 
     // setup the server
     server.setListeningSocket(server_port);

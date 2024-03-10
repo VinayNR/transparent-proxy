@@ -32,4 +32,6 @@ class ProxyServer {
         void createClientThreadPool(int);
 
         void start();
+
+        static void handleSignalINT(int);
 };
