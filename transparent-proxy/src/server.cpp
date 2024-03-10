@@ -335,10 +335,10 @@ void ProxyServer::processRequests() {
                 // wait for response
 
                 // delete the dynamic SNAT added for this client connection
-                std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
-                if (system(delete_command.c_str()) == 0) {
-                    Logger::debug("Deleted the SNAT rule dynamically");
-                }
+                // std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
+                // if (system(delete_command.c_str()) == 0) {
+                //     Logger::debug("Deleted the SNAT rule dynamically");
+                // }
 
             }
         }
