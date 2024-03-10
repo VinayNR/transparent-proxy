@@ -294,25 +294,24 @@ void ProxyServer::processRequests() {
                     close(new_sockfd);
                 }
 
+                // Bind the socket to any available local port
+                struct sockaddr_in local_addr;
+                memset(&local_addr, 0, sizeof(local_addr));
+                local_addr.sin_family = AF_INET;
+                local_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to any available local IP address
+                local_addr.sin_port = htons(0); // Let the system choose an available local port
+
+                if (bind(new_sockfd, (struct sockaddr*)&local_addr, sizeof(local_addr)) == -1) {
+                    std::cerr << "Failed to bind socket" << std::endl;
+                    close(new_sockfd);
+                }
+
                 // Connect to the remote server
                 if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
                     std::cerr << "Failed to connect to server" << std::endl;
                     close(new_sockfd);
                 }
 
-                // Get local address and port
-                struct sockaddr_in local_addr;
-                socklen_t addr_len = sizeof(local_addr);
-                if (getsockname(new_sockfd, (struct sockaddr*)&local_addr, &addr_len) == -1) {
-                    std::cerr << "Failed to get local address and port: " << std::strerror(errno) << std::endl;
-                    close(new_sockfd);
-                }
-
-                char local_ip_str[INET_ADDRSTRLEN];
-                inet_ntop(AF_INET, &local_addr.sin_addr, local_ip_str, INET_ADDRSTRLEN);
-
-                // send request to the server on behalf of the client
-                Logger::debug(" ------- Local IP Address: ", local_ip_str);
                 Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr.sin_port));
 
                 // Add SNAT dynamically using iptables
@@ -330,7 +329,7 @@ void ProxyServer::processRequests() {
 
                 // delete the dynamic SNAT added for this client connection
                 // Command to delete dynamically added SNAT rule
-                std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport 8888 --to-source " + std::string(peer_ip_str);
+                std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
                 if (system(delete_command.c_str()) == 0) {
                     Logger::debug("Deleted the SNAT rule dynamically");
                 }
