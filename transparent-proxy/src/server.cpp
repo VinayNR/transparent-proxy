@@ -312,6 +312,13 @@ void ProxyServer::processRequests() {
                     close(new_sockfd);
                 }
 
+                // Retrieve the local port using getsockname
+                socklen_t addrlen = sizeof(local_addr);
+                if (getsockname(new_sockfd, (struct sockaddr*)&local_addr, &addrlen) == -1) {
+                    std::cerr << "Failed to get local socket address" << std::endl;
+                    close(new_sockfd);
+                }
+
                 Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr.sin_port));
 
                 // Add SNAT dynamically using iptables
@@ -328,7 +335,6 @@ void ProxyServer::processRequests() {
                 // wait for response
 
                 // delete the dynamic SNAT added for this client connection
-                // Command to delete dynamically added SNAT rule
                 std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
                 if (system(delete_command.c_str()) == 0) {
                     Logger::debug("Deleted the SNAT rule dynamically");
