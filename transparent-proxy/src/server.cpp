@@ -283,25 +283,14 @@ void ProxyServer::processRequests() {
                 inet_ntop(AF_INET, &peer_addr.sin_addr, peer_ip_str, sizeof(peer_ip_str));
 
                 // Print the source IP address
-                Logger::debug("Source address: ", peer_ip_str);
-                Logger::debug("Source port: ", ntohs(peer_addr.sin_port));
-
-                // Add SNAT dynamically using iptables
-                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport 8888 --to-source " + std::string(peer_ip_str);
-                system(command.c_str());
-                Logger::debug("Added a SNAT rule dynamically");
+                Logger::debug("Peer address: ", peer_ip_str);
+                Logger::debug("Peer port: ", ntohs(peer_addr.sin_port));
 
                 // connect to the server and issue this request
                 // create a new TCP socket to open a connection to the server
                 int new_sockfd;
                 if ((new_sockfd = SocketOps::createSocket(SOCK_STREAM)) == -1) {
                     std::cerr << "Failed to create a socket" << std::endl;
-                    close(new_sockfd);
-                }
-
-                // Connect to the remote server
-                if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
-                    std::cerr << "Failed to connect to server" << std::endl;
                     close(new_sockfd);
                 }
 
@@ -317,10 +306,21 @@ void ProxyServer::processRequests() {
                 inet_ntop(AF_INET, &local_addr.sin_addr, local_ip_str, INET_ADDRSTRLEN);
 
                 // send request to the server on behalf of the client
-                Logger::debug(" ----------- Making a request to server ----------- ");
                 Logger::debug(" ------- Local IP Address: ", local_ip_str);
                 Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr.sin_port));
 
+                // Add SNAT dynamically using iptables
+                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
+                system(command.c_str());
+                Logger::debug("Added a SNAT rule dynamically");
+
+                // Connect to the remote server
+                if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
+                    std::cerr << "Failed to connect to server" << std::endl;
+                    close(new_sockfd);
+                }
+
+                Logger::debug(" ----------- Making a request to server ----------- ");
                 // write the request to the server
                 if (writeRequest(new_sockfd, http_request) <= 0) {
                     std::cerr << "Error writing request on the new socket" << std::endl;
