@@ -322,9 +322,9 @@ void ProxyServer::processRequests() {
                 Logger::debug(" ------- Local TCP Port: ", ntohs(local_addr.sin_port));
 
                 // Add SNAT dynamically using iptables
-                std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
-                system(command.c_str());
-                Logger::debug("Added a SNAT rule dynamically");
+                // std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
+                // system(command.c_str());
+                // Logger::debug("Added a SNAT rule dynamically");
 
                 Logger::debug(" ----------- Making a request to server ----------- ");
                 // write the request to the server
