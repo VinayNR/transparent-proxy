@@ -294,6 +294,12 @@ void ProxyServer::processRequests() {
                     close(new_sockfd);
                 }
 
+                // Connect to the remote server
+                if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
+                    std::cerr << "Failed to connect to server" << std::endl;
+                    close(new_sockfd);
+                }
+
                 // Get local address and port
                 struct sockaddr_in local_addr;
                 socklen_t addr_len = sizeof(local_addr);
@@ -313,12 +319,6 @@ void ProxyServer::processRequests() {
                 std::string command = "iptables -t nat -A POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr.sin_port)) + " --to-source " + std::string(peer_ip_str);
                 system(command.c_str());
                 Logger::debug("Added a SNAT rule dynamically");
-
-                // Connect to the remote server
-                if (connect(new_sockfd, (struct sockaddr*)&original_dst_addr, sizeof(original_dst_addr)) == -1) {
-                    std::cerr << "Failed to connect to server" << std::endl;
-                    close(new_sockfd);
-                }
 
                 Logger::debug(" ----------- Making a request to server ----------- ");
                 // write the request to the server
