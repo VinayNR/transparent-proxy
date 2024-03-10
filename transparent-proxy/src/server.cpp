@@ -299,7 +299,7 @@ void ProxyServer::processRequests() {
                 memset(&local_addr, 0, sizeof(local_addr));
                 local_addr.sin_family = AF_INET;
                 local_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to any available local IP address
-                local_addr.sin_port = htons(0); // Let the system choose an available local port
+                local_addr.sin_port = htons(55555); // Let the system choose an available local port
 
                 if (bind(new_sockfd, (struct sockaddr*)&local_addr, sizeof(local_addr)) == -1) {
                     std::cerr << "Failed to bind socket" << std::endl;
