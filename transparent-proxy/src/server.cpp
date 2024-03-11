@@ -144,13 +144,19 @@ HttpRequest * ProxyServer::readRequest(int client_sockfd) {
 * Writes a request to the socket
 */
 int ProxyServer::writeRequest(int sockfd, HttpRequest * http_request) {
-    std::cout << std::endl << " --------- Writing request --------- " << std::endl;
+    Logger::debug("Writing request on the socket");
     return SocketOps::send(sockfd, http_request->getSerializedRequest(), http_request->getSerializedRequestLength());
 }
 
+/*
+* Writes a response to the socket
+*/
+int ProxyServer::writeResponse(int sockfd, HttpResponse * http_response) {
+    Logger::debug("Writing response on the socket");
+    return SocketOps::send(sockfd, http_response->getSerializedResponse(), http_response->getSerializedResponseLength());
+}
 
 HttpResponse * ProxyServer::readResponse(int sockfd) {
-    std::cout << std::endl << " ----------- Reading the response ----------- " << std::endl;
     // create a http response object
     HttpResponse *http_response = new HttpResponse;
 
@@ -162,14 +168,13 @@ HttpResponse * ProxyServer::readResponse(int sockfd) {
 
     // deserialize the data into a http response object
     if (http_response->deserialize() == -1) {
-        std::cerr << "Failed to deserialize response object" << std::endl;
+        Logger::error("Failed to deserialize response object");
         delete http_response;
         return nullptr;
     }
     
-    std::cout << "Response: " << std::endl;
-    std::cout << http_response->getSerializedResponse() << std::endl;
-    std::cout << " --------- Finished reading response --------- " << std::endl;
+    Logger::debug("Response: \n", http_response->getSerializedResponse());
+    Logger::debug("Finished reading response");
     return http_response;
 }
 
@@ -240,6 +245,7 @@ void ProxyServer::processRequests() {
     Logger::debug("------ Proxy Server Thread Pool: ", std::this_thread::get_id(), " ------- ");
 
     HttpRequest *http_request;
+    HttpResponse *http_response;
 
     while (true) {
         // take a connection from the queue
@@ -334,6 +340,26 @@ void ProxyServer::processRequests() {
                 }
 
                 // wait for response
+                Logger::debug("Receiving a response from the server");
+                if ((http_response = readResponse(new_sockfd)) == nullptr) {
+
+                    // 404 response
+                    http_response = new HttpResponse;
+                    http_response->setHttpStatusCode(404)
+                                ->setHttpStatusMessage("Not found")
+                                ->setHttpVersion(http_request->getHttpVersion())
+                                ->addResponseHeaders("Connection", "close")
+                                ->serialize();
+                }
+
+                // add the connection close header
+                http_response->addResponseHeaders("Proxy-Connection", "close");
+
+                // serialize the response
+                http_response->serialize();
+
+                // send the response to client
+                writeResponse(client_sockfd, http_response);
 
                 // delete the dynamic SNAT added for this client connection
                 std::string delete_command = "iptables -t nat -D POSTROUTING -p tcp -j SNAT --sport " + std::to_string(ntohs(local_addr2.sin_port)) + " --to-source " + std::string(peer_ip_str);
